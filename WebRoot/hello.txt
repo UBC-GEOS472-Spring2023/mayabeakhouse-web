@@ -1,0 +1,14 @@
+https://docs.python.org/3/library/http.server.html
+
+there are multiple ways to launch a local web server.
+
+1. Start a Python Shell ("d:\AppLinks\Python311 shell")
+   change directory to d:, cd d:\WebRoot,
+   python -m http.server (leave shell window running)
+   point browser to "http://127.0.0.1:8000" (see directory listing)
+
+2. Start a node.js Shell ("d:\AppLinks\node.js with git")
+   change directory to d:, cd d:\WebRoot,
+   node helloapp.js (launch this javascript code)
+   point browser to "http://127.0.0.1:3000" (see helloapp output)
+    
