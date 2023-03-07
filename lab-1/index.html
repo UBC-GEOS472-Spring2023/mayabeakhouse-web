@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8' />
+    <title>Vancouver West Side Food Assets Map</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+      body { 
+        margin: 0; 
+        padding: 0; 
+      }
+
+      #map { 
+        position: absolute; 
+        top: 0; 
+        bottom: 0; 
+        width: 100%; 
+      }
+
+      .map-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: #d0d4d7;
+        margin-left: 10px;
+        margin-top: 10px;
+        font-family: Trebuchet MS;
+        overflow: auto;
+        border-radius: 5px;
+      }
+    
+      .map-legend {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        background: #d0d4d7;
+        margin-left: 10px;
+        margin-bottom: 25px;
+        font-family: Trebuchet MS;
+        overflow: auto;
+        border-radius: 5px;
+      }
+      
+    </style>
+  </head>
+  <body>
+    <div id='map'></div>
+    <div class='map-overlay' id='features'><h2 style="color:white; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px;">Vancouver Westside Food Assets Map</h2>
+      <p style="font-size:small; width:350px; color:white; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px;">Based on contributions by Westside community members and UBC Climate Action Mobilizers. <br><br> To add or suggest an edit, please email cam.ccel@ubc.ca </p>
+    </div>
+    <div class='map-legend' id="features">
+      <img src="legend.png" alt="Legend" width="240" height="160"></div>
+  </div>
+
+    <script>
+    // The value for 'accessToken' begins with 'pk...'
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWF5YWJlYWsiLCJhIjoiY2xld2QwaW15MDhtbjN0cXFjOGw2MGdwMiJ9.4gvCm_szNKWaWqdjdN7I8w'; 
+    const map = new mapboxgl.Map({
+      container: 'map',
+      // Replace YOUR_STYLE_URL with your style URL.
+      style: 'mapbox://styles/mayabeak/clex6mxom001f01o7zq1tyuw9', 
+      center: [-123.14, 49.25,],
+      zoom: 11
+    });
+
+    /* 
+    Add an event listener that runs
+      when a user clicks on the map element.
+    */
+    map.on('click', (event) => {
+      const features = map.queryRenderedFeatures(event.point, {
+layers: ['food-assets']
+});
+          if (!features.length) {
+            return;
+      }
+      const feature = features[0];
+ 
+      const popup = new mapboxgl.Popup({ offset: [0, -15] })
+        .setLngLat(feature.geometry.coordinates)
+        .setHTML(
+          `<h3 style="font-family:Trebuchet MS">${feature.properties.name}</h3><p style="font-family:Trebuchet MS">${feature.properties.description}</p>`
+        )
+        .addTo(map);
+    });
+</script>
+</body>
+</html>
