@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Commuter Flows between Counties in Oregon</title>
+
+        <!-- Leaflet stylesheet -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>
+
+        <!-- Load Leaflet -->
+        <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+
+        <!-- Load animation tweening library requirement for CanvasFlowMapLayer -->
+        <script src="https://unpkg.com/@tweenjs/tween.js@18.5.0/dist/tween.umd.js"></script>
+
+        <!-- then load CanvasFlowMapLayer -->
+        <script src="CanvasFlowmapLayer.js"></script>
+
+        <!-- Load .js file containing Oregon inter-county commuter flows -->
+        <script type="text/javascript" src="finalpoints2.js"></script>
+
+        <!-- Load Google font for title and description -->
+        <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+
+        <!-- style map, title, and description -->
+        <style type="text/css">
+          html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            }
+
+          #map {
+            min-height: 100%;
+            }
+            #title-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+          }
+
+          #title {
+            padding: 5px 5px;
+            font-family: 'Inter';
+            font-size: 16px;
+            color: white;
+            background: #626a71;
+            border-radius: 0px;
+            max-width: 250px;
+          }
+
+          #description {
+            padding: 5px 5px;
+            font-family: 'Inter';
+            font-size: 12px;
+            color: white;
+            background: #626a71;
+            border-radius: 0px;
+            max-width: 250px;
+          }
+
+
+        </style>
+
+    </head>
+
+    <body>
+        <!-- add map -->
+        <div id="map"></div>
+        
+        <!-- add title and description -->
+        <div id="title-container">
+          <div id="title">Commuter Flows between Counties in Oregon</div>
+          <div id="description">This map shows commuter flows of over 1000 workers, traveling between different counties in Oregon, from 2011-2015 US Census Bureau data. Mouse over a county to see its flows! </div>
+        </div>
+
+        <script type="text/javascript">
+
+          // create map
+          var map = L.map('map', {               
+              center: [44.5, -120.809174],
+              zoom: 7
+          });
+
+          // load tile layer
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+               attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+               subdomains: 'abcd',
+               maxZoom: 20
+            }).addTo(map);
+
+
+          // create Canvas Flowmap layer using data from finalpoints2.js
+          var oneToManyFlowmapLayer = L.canvasFlowmapLayer(data, { //data is the variable name I used for defining the cook.js data
+              originAndDestinationFieldIds: {
+                originUniqueIdField: 'Residence GEOID',  //origin ID, use GEOID_B if you want to reverse the flow
+                originGeometry: { //origin coordinates
+                  x: 'residence_lon',
+                  y: 'residence_lat'
+                },
+                destinationUniqueIdField: 'Workplace GEOID', //destination ID
+                destinationGeometry: { //destination coordinates
+                  x: 'workplace_lon',
+                  y: 'workplace_lat'
+                }
+          },
+
+          // add animations to show direction of flow, and start with all flows visible
+          pathDisplayMode: 'all',
+          animationStarted: true,
+          animationEasingFamily: 'Cubic',
+          animationEasingType: 'In',
+          animationDuration: 2000
+        }).addTo(map);
+
+        // mouseover to focus on one county
+        oneToManyFlowmapLayer.on('mouseover', function(e) {
+          if (e.sharedOriginFeatures.length) {
+            oneToManyFlowmapLayer.selectFeaturesForPathDisplay(e.sharedOriginFeatures, 'SELECTION_NEW');
+          }
+          if (e.sharedDestinationFeatures.length) {
+            oneToManyFlowmapLayer.selectFeaturesForPathDisplay(e.sharedDestinationFeatures, 'SELECTION_NEW');
+          }
+    });
+        </script>
+   </body>
+</html>
